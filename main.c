@@ -50,50 +50,53 @@ int setdeadline(int deadlines[][5]) {
       "date e.g. 2024, mar, 9, 15, 0 \n"
    );
 
-   char acquireddatatxt[6][6];
-   int convertedtointdata[6][6];
+   char monthStr[6];
+   int convertedToIntData[6];
 
 // get data from a user
    printf("row: \n");
-   scanf("%s", acquireddatatxt[0]);
+   scanf("%d", convertedToIntData[0]);
 
    printf("year: \n");
-   scanf("%d", convertedtointdata[1]);
+   scanf("%d", convertedToIntData[1]);
 
    printf("month: \n");
-   scanf("%d", convertedtointdata[2]);
+   // scanf("%s", &monthStr);
 
    printf("day: \n");
-   scanf("%d", convertedtointdata[3]);
+   scanf("%d", convertedToIntData[2]);
 
    printf("hrs: \n");
-   scanf("%d", convertedtointdata[4]);
+   scanf("%d", convertedToIntData[3]);
 
    printf("min: \n");
-   scanf("%d", convertedtointdata[5]);
+   scanf("%d", convertedToIntData[4]);
 
 // conver acquired data to int
-   convertedtointdata[0][0] = convertmonth(acquireddatatxt[0]);
+   printf("%s\n", monthStr);
+   // convertedToIntData[2] = convertmonth(monthStr);
 }
 
 char convertmonth(char month[]) {
-   int monthnum;
+   int monthNum = -1;
 
-   if      (strcmp(month, "jan")) { monthnum = 1; }
-   else if (strcmp(month, "feb")) { monthnum = 2; }
-   else if (strcmp(month, "mar")) { monthnum = 3; }
-   else if (strcmp(month, "apr")) { monthnum = 4; }
-   else if (strcmp(month, "may")) { monthnum = 5; }
-   else if (strcmp(month, "jun")) { monthnum = 6; }
-   else if (strcmp(month, "jul")) { monthnum = 7; }
-   else if (strcmp(month, "aug")) { monthnum = 8; }
-   else if (strcmp(month, "sep")) { monthnum = 9; }
-   else if (strcmp(month, "oct")) { monthnum = 10; }
-   else if (strcmp(month, "nov")) { monthnum = 11; }
-   else if (strcmp(month, "dec")) { monthnum = 12; }
+   if      (!strcmp(month, "jan")) { monthNum = 1; }
+   else if (!strcmp(month, "feb")) { monthNum = 2; }
+   else if (!strcmp(month, "mar")) { monthNum = 3; }
+   else if (!strcmp(month, "apr")) { monthNum = 4; }
+   else if (!strcmp(month, "may")) { monthNum = 5; }
+   else if (!strcmp(month, "jun")) { monthNum = 6; }
+   else if (!strcmp(month, "jul")) { monthNum = 7; }
+   else if (!strcmp(month, "aug")) { monthNum = 8; }
+   else if (!strcmp(month, "sep")) { monthNum = 9; }
+   else if (!strcmp(month, "oct")) { monthNum = 10; }
+   else if (!strcmp(month, "nov")) { monthNum = 11; }
+   else if (!strcmp(month, "dec")) { monthNum = 12; }
 
-   printf("%d\n", strcmp(monthnum, "jul"));
-   return monthnum;
+   printf("%s\n", month);
+   printf("%d\n", strcmp(month, "jul"));
+   printf("Month Num: %d", monthNum);
+   return monthNum;
 }
 
 
