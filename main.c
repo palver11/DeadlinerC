@@ -1,15 +1,7 @@
 /* notes:
 probably there is a way to get the date in numerical format, so i wouldn't have to convert "mar" to 3
 but i think i'll keep it this way. for the additional practice(to write more code) or just because i'm lazy, idk.
-
-
-
-
-
-
 */
-
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,25 +10,20 @@ but i think i'll keep it this way. for the additional practice(to write more cod
 #include <time.h>
 
 
-
-int setdeadline(int deadlines[][5]);
+void setdeadline(int deadlines[][6]);
 char convertmonth(char month[]);
 
 int main() {
    time_t t; 
    int elements = 15;
 
-// row | year | month | day | hours | minutes
-   int deadlines[elements][5]; 
+// year | month | day | hours | minutes
+   int deadlines[elements][6]; 
 
    time(&t); 
    // struct tm tm = *localtime(&t);
    
    setdeadline(deadlines);
-   // for (int i = 0; i < elements; i++) {
-   //    printf("%d", ctime(&t));
-
-   // }
 
 
    getchar();
@@ -44,37 +31,43 @@ int main() {
 }
 
 
-int setdeadline(int deadlines[][5]) {
+void setdeadline(int deadlines[][6]) {
    printf(
       "input the row and date: \n"
       "date e.g. 2024, mar, 9, 15, 0 \n"
    );
 
-   char monthStr[6];
-   int convertedToIntData[6];
+   char monthStr[4];
+   int row;
+   int convertedToIntData[5];
 
 // get data from a user
    printf("row: \n");
-   scanf("%d", convertedToIntData[0]);
+   scanf("%d", &row);
 
    printf("year: \n");
-   scanf("%d", convertedToIntData[1]);
+   scanf("%d", &convertedToIntData[0]);
 
    printf("month: \n");
-   // scanf("%s", &monthStr);
+   scanf("%s", monthStr);
 
    printf("day: \n");
-   scanf("%d", convertedToIntData[2]);
+   scanf("%d", &convertedToIntData[2]);
 
    printf("hrs: \n");
-   scanf("%d", convertedToIntData[3]);
+   scanf("%d", &convertedToIntData[3]);
 
    printf("min: \n");
-   scanf("%d", convertedToIntData[4]);
+   scanf("%d", &convertedToIntData[4]);
 
-// conver acquired data to int
-   printf("%s\n", monthStr);
-   // convertedToIntData[2] = convertmonth(monthStr);
+// conver month to int
+   convertedToIntData[1] = convertmonth(monthStr);
+
+   for ( int i = 0; i < 6; i++) {
+      deadlines[row][i] = convertedToIntData[i];
+      // printf("row: %d\n", deadlines[row][i]);
+      printf("length: %zu\n", 6);
+   }
 }
 
 char convertmonth(char month[]) {
@@ -93,9 +86,7 @@ char convertmonth(char month[]) {
    else if (!strcmp(month, "nov")) { monthNum = 11; }
    else if (!strcmp(month, "dec")) { monthNum = 12; }
 
-   printf("%s\n", month);
-   printf("%d\n", strcmp(month, "jul"));
-   printf("Month Num: %d", monthNum);
+   printf("Month Num: %d\n", monthNum);
    return monthNum;
 }
 
