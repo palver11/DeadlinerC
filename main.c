@@ -1,122 +1,118 @@
-/* notes:
-probably there is a way to get the date in numerical format, so i wouldn't have to convert "mar" to 3
-but i think i'll keep it this way. for the additional practice(to write more code) or just because i'm lazy, idk.
-*/
-
-#include <stdio.h>
+// TODO
+// move constants from the function into the global scope
+// add 0s in singular values when printing time
 #include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
+#include <stdio.h>
 #include <time.h>
+#include <math.h>
 
+void show_tasks(int* tasks);
+void set_task(int* tasks);
+void conv_secs(int secs);
 
-void setdeadline(int deadlines[][6]);
-char convertmonth(char month[]);
+int tasks[2];
 
-int main() {
-   time_t t; 
-   int elements = 15;
+int main(int argc, char* argv[]) {
 
-// year | month | day | hours | minutes
-   int deadlines[elements][6]; 
-
-   time(&t); 
-   // struct tm tm = *localtime(&t);
+   set_task(tasks);
+   printf("\nEXECUTED"); // DEBUG
+   show_tasks(tasks);
    
-   setdeadline(deadlines);
 
 
-   getchar();
-
+   return 0;
 }
 
+void show_tasks(int* tasks) {
+   // Get the current time
+   time_t now = time(NULL);
 
-void setdeadline(int deadlines[][6]) {
-   printf(
-      "input the row and date: \n"
-      "date e.g. 2024, mar, 9, 15, 0 \n"
-   );
-
-   char monthStr[4];
-   int row;
-   int convertedToIntData[5];
-
-// get data from a user
-   printf("row: \n");
-   scanf("%d", &row);
-
-   printf("year: \n");
-   scanf("%d", &convertedToIntData[0]);
-
-   printf("month: \n");
-   scanf("%s", monthStr);
-
-   printf("day: \n");
-   scanf("%d", &convertedToIntData[2]);
-
-   printf("hrs: \n");
-   scanf("%d", &convertedToIntData[3]);
-
-   printf("min: \n");
-   scanf("%d", &convertedToIntData[4]);
-
-// conver month to int
-   convertedToIntData[1] = convertmonth(monthStr);
-
-   for ( int i = 0; i < 6; i++) {
-      deadlines[row][i] = convertedToIntData[i];
-      // printf("row: %d\n", deadlines[row][i]);
-      printf("length: %zu\n", 6);
+   for (int i = 0; tasks[i] != 0; i++) {
+      printf("\nTask %d: ", i+1);
+      // Calculate the difference in seconds between the current time and the future time
+      conv_secs(difftime(tasks[i], now));
    }
 }
 
-char convertmonth(char month[]) {
-   int monthNum = -1;
+void set_task(int* tasks) {
+   int index;
+   int year;
+   int mon;
+   int day;
+   int hour;
+   int mins;
+   // int secs;
+   // User Input
+   printf("\nChoose task to change by index: ");
+   scanf("%d", index);
+   printf("\nEnter end time of your deadline (nums).\nYear: ");
+   scanf("%d", year);
+   printf("\nMonth: ");
+   scanf("%d", mon);
+   printf("\nDay: ");
+   scanf("%d", day);
+   printf("\nHour: ");
+   scanf("%d", hour);
+   printf("\nMinutes: ");
+   scanf("%d", mins);
 
-   if      (!strcmp(month, "jan")) { monthNum = 1; }
-   else if (!strcmp(month, "feb")) { monthNum = 2; }
-   else if (!strcmp(month, "mar")) { monthNum = 3; }
-   else if (!strcmp(month, "apr")) { monthNum = 4; }
-   else if (!strcmp(month, "may")) { monthNum = 5; }
-   else if (!strcmp(month, "jun")) { monthNum = 6; }
-   else if (!strcmp(month, "jul")) { monthNum = 7; }
-   else if (!strcmp(month, "aug")) { monthNum = 8; }
-   else if (!strcmp(month, "sep")) { monthNum = 9; }
-   else if (!strcmp(month, "oct")) { monthNum = 10; }
-   else if (!strcmp(month, "nov")) { monthNum = 11; }
-   else if (!strcmp(month, "dec")) { monthNum = 12; }
+   // DEBUG
+   printf("\n%d", index);
+   printf("\n%d", year);
+   printf("\n%d", mon);
+   printf("\n%d", day);
+   printf("\n%d", hour);
+   printf("\n%d", mins);
 
-   printf("Month Num: %d\n", monthNum);
-   return monthNum;
-}
+   // Define a struct tm for a future date (e.g., January 1, 2030)
+   struct tm future_date = {0};
+   future_date.tm_year = year - 1900;  // Year since 1900
+   future_date.tm_mon = mon - 1;             // January (0-based)
+   future_date.tm_mday = day;           // 1st
+   future_date.tm_hour = hour;
+   future_date.tm_min = mins;
+   future_date.tm_sec = 0;
 
-
-
-/* code reference
-//sat mar  9 09:00:24 2024
-
-fopen("e:\\cprogram\\newprogram.txt","w");
-fopen("e:\\cprogram\\oldprogram.bin","r");
-fclose(fptr);
-
-int main()
-{
-   int num;
-   file *fptr;
-
-   fptr = fopen("c:\\program.txt","w");
-
-   if(fptr == null)
-   {
-      printf("error!");   
-      exit(1);             
+   // Convert the future date to a time_t value
+   time_t future_time = mktime(&future_date);
+   if (future_time == -1) {
+      printf("Failed to convert future date.\n");
+      return;
    }
 
-   printf("enter num: ");
-   scanf("%d",&num);
-
-   fprintf(fptr,"%d",num);
-   fclose(fptr);
+   tasks[index] = future_time;
 }
 
-*/
+void conv_secs(int secs) {
+   
+   if (secs < 1) {
+      printf("\nTime left: 0|0:0:0");
+      return;
+   }
+
+   // Convert seconds to days
+   const int SEC_DAY = 86400;
+   const int SEC_HR = 3600;
+   const int SEC_MIN = 60;
+
+   int days;
+   int hrs;
+   int mins;
+
+   printf("%d", secs);
+
+   if (secs >= SEC_DAY)
+      days = secs / SEC_DAY;
+      secs -= days * SEC_DAY;
+   
+   if (secs >= SEC_HR)
+      hrs = secs / SEC_HR;
+      secs -= hrs * SEC_HR;
+   
+   if (secs >= SEC_MIN)
+      mins = secs / SEC_MIN;
+      secs -= mins * SEC_MIN;
+
+   printf("\nTime left: %d|%d:%d:%d", days, hrs, mins, secs);
+
+}
