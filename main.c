@@ -1,10 +1,7 @@
 // TODO
-// add 0s in singular values when printing time
 // add error check for a wrong input with non-numbers in set_task()
-// make refresh option in the menu
 // make save and load data from the data file.
 // doesn't work with names with whitespaces. Fix it.
-// fgets includes \n at the end of the task name. Find a way to get get a name without \n
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,7 +31,7 @@ int tasks[TASKS_SIZE];
 
 int main(int argc, char* argv[]) {
   for (int i = 0; i < TASKS_SIZE; i++) {
-    strcpy(task_names[i], "Empty");
+    strcpy(task_names[i], "-----");
   }
 
   bool exit_program = false;
@@ -45,6 +42,9 @@ int main(int argc, char* argv[]) {
         set_task();
         break;
       case 2:
+        show_menu();
+        break;
+      case 3:
         exit_program = true;
         break;
     }
@@ -63,10 +63,12 @@ int show_menu() {
 
   printf("\n\n= MENU =\n----------");
   printf("\n1.Edit a task");
-  printf("\n2.Exit");
+  printf("\n2.Refresh");
+  printf("\n3.Exit");
   printf("\n\nEnter option number: ");
 
   do {
+    // Get the option number
     int input_err_check = scanf(" %d", &choice);
     if (input_err_check != 1) {
       printf("\nInvalid symbol! Exiting the program...\n");
@@ -81,6 +83,7 @@ int show_menu() {
     switch (choice) {
       case 1:
       case 2:
+      case 3:
         valid_choice = true;
         break;
       default:
@@ -113,31 +116,42 @@ void set_task() {
   // int secs;
 
   // User Input
+
   // Task
   do {
     printf("\nChoose task to change by index: ");
-    scanf("%d", &index - 1);
+    scanf("%d", &index);
   } while (index > (TASKS_SIZE - 1) || index < 0);
+  index--;
+
   // Task name
   printf("\nName the task: ");
   getchar();
   fgets(task_names[index], MAX_LEN_NAME, stdin);
+  for (int i = 0; i < MAX_LEN_NAME; i++) { // remove \n from the string which fgets has added
+    if (task_names[index][i] == '\n') { task_names[index][i] = '\0'; break; }
+  }
+
   // Year
   printf("Enter end time of your deadline (nums).\nYear: ");
   scanf("%d", &year);
+
   // Month
   do {
     printf("Month: ");
     scanf("%d", &mon);
   } while (mon > 12 || mon < 1);
+
   // Day
   printf("Day: ");
   scanf("%d", &day);
+
   // Hours
   do {
   printf("Hour (24): ");
   scanf("%d", &hour);
   } while (hour > 24 || hour < 0);
+
   // Minutes
   printf("Minutes: ");
   scanf("%d", &mins);
@@ -164,30 +178,40 @@ void set_task() {
 }
 
 void conv_secs(int secs) {
-   
-   if (secs < 1) {
-      // printf("0|0:0:0");
-      printf("---");
-      return;
-   }
+  
+  if (secs < 1) {
+    // printf("0|0:0:0");
+    printf("---");
+    return;
+  }
 
-   int days;
-   int hrs;
-   int mins;
+  int days = 0;
+  int hrs  = 0;
+  int mins = 0;
 
-   // Convert seconds to days
-   if (secs >= SEC_DAY)
-      days = secs / SEC_DAY;
-      secs -= days * SEC_DAY;
-   
-   if (secs >= SEC_HR)
-      hrs = secs / SEC_HR;
-      secs -= hrs * SEC_HR;
-   
-   if (secs >= SEC_MIN)
-      mins = secs / SEC_MIN;
-      secs -= mins * SEC_MIN;
+  // Convert seconds to days
+  if (secs >= SEC_DAY) {
+    days = secs / SEC_DAY;
+    secs -= days * SEC_DAY;
+  }
+  
+  if (secs >= SEC_HR) {
+    hrs = secs / SEC_HR;
+    secs -= hrs * SEC_HR;
+  }
+  
+  if (secs >= SEC_MIN) {
+    mins = secs / SEC_MIN;
+    secs -= mins * SEC_MIN;
+  }
 
-   printf("%dd | [%d:%d:%d]", days, hrs, mins, secs);
+  // format time string, add 0 to 1 digit nums
+  char z[5] = {""};
+  if (days < 10) z[0] = '0';
+  if (hrs  < 10) z[1] = '0';
+  if (mins < 10) z[2] = '0';
+  if (secs < 10) z[3] = '0';
+
+  printf("%c%dd | [%c%d:%c%d:%c%d]", z[0], days, z[1], hrs, z[2], mins, z[3], secs);
 
 }
