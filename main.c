@@ -1,7 +1,6 @@
 // TODO
 // add error check for a wrong input with non-numbers in set_task()
 // make save and load data from the data file.
-// doesn't work with names with whitespaces. Fix it.
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -119,7 +118,7 @@ void set_task() {
 
   // Task
   do {
-    printf("\nChoose task to change by index: ");
+    printf("\nTask to change (number): ");
     scanf("%d", &index);
   } while (index > (TASKS_SIZE - 1) || index < 0);
   index--;
