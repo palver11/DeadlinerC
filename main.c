@@ -11,9 +11,11 @@
 #include <string.h>
 
 #define TASKS_SIZE 5
-#define MAX_LEN_NAME 10
+#define MAX_LEN_NAME 30
 
 // PROTOTYPES
+void save_data();
+void load_data();
 void show_tasks();
 void set_task();
 void conv_secs(int secs);
@@ -29,16 +31,20 @@ int tasks[TASKS_SIZE];
 
 
 int main(int argc, char* argv[]) {
+  save_data();
+  // Assing default task names
   for (int i = 0; i < TASKS_SIZE; i++) {
     strcpy(task_names[i], "-----");
   }
 
+  // Program processing
   bool exit_program = false;
   while (!exit_program) {
 
     switch (show_menu()) {
       case 1:
         set_task();
+        save_data();
         break;
       case 2:
         show_menu();
@@ -51,6 +57,47 @@ int main(int argc, char* argv[]) {
   
   return 0;
 }
+
+// WRITE TO A FILE
+// fprintf, fputs, puts
+// READ FROM A FILE
+// fscanf, fgets, gets
+
+void save_data() {
+  FILE *p_file = fopen("data.txt", "w");
+  int size = (TASKS_SIZE * MAX_LEN_NAME) + (30 * TASKS_SIZE); // dynamically define size for the array
+  char data_to_save[size];
+
+  data_to_save[0] = '\0';
+
+  for (int i = 0; i < TASKS_SIZE; i++) {
+    char str_secs[30];
+
+    sprintf(str_secs, "%d", tasks[i]); // cast int to str
+    strcat(data_to_save, task_names[i]);
+    strcat(data_to_save, ",");
+    strcat(data_to_save, str_secs);
+    strcat(data_to_save, ".");
+  }
+
+  fprintf(p_file, data_to_save);
+
+  fclose(p_file);
+}
+
+// void load_data() {
+//   FILE *p_file;
+//   if ((p_file = fopen("data.txt", "r")) == NULL) {
+//     printf("Error: unable to load a file. New file was created.");
+//     // exit(EXIT_FAILURE);
+//     // save_data(); // Does fopen create the abscent file automatically?
+//   }
+//   char loaded_data[100]
+
+//   fscanf(p_file, loaded_data);
+
+//   fclose(p_file);
+// }
 
 int show_menu() {
   int choice;
