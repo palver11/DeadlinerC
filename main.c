@@ -31,11 +31,12 @@ int tasks[TASKS_SIZE];
 
 
 int main(int argc, char* argv[]) {
-  save_data();
   // Assing default task names
   for (int i = 0; i < TASKS_SIZE; i++) {
     strcpy(task_names[i], "-----");
   }
+
+  load_data();
 
   // Program processing
   bool exit_program = false;
@@ -85,19 +86,55 @@ void save_data() {
   fclose(p_file);
 }
 
-// void load_data() {
-//   FILE *p_file;
-//   if ((p_file = fopen("data.txt", "r")) == NULL) {
-//     printf("Error: unable to load a file. New file was created.");
-//     // exit(EXIT_FAILURE);
-//     // save_data(); // Does fopen create the abscent file automatically?
-//   }
-//   char loaded_data[100]
+void load_data() {
+  FILE *p_file;
+  int size = (TASKS_SIZE * MAX_LEN_NAME) + (30 * TASKS_SIZE); // dynamically define size for the array
+  char loaded_data[size];
 
-//   fscanf(p_file, loaded_data);
+  if ((p_file = fopen("data.txt", "r")) == NULL) {
+    printf("Error: unable to load a file. New file was created.");
+    // exit(EXIT_FAILURE);
+    // save_data(); // Does fopen with "r" create the abscent file automatically?
+  }
 
-//   fclose(p_file);
-// }
+  fgets(loaded_data, size, p_file);
+
+  // Parsing and assignment of the loaded data
+  int y = 0;
+  // if (loaded_data[y] == NULL) {
+  //   printf("Loading met the end of the file earlier than expected. Data may be corrupted!");
+  //   getchar();
+  //   break;
+  // }
+
+  for (int i = 0; i < TASKS_SIZE; i++) {
+    // parsing
+    char loaded_name[MAX_LEN_NAME];    
+    char loaded_secs[30];
+
+
+      // name
+    for (int ii = 0; loaded_data[ii] != ','; ii++, y++) {
+      loaded_name[ii] = loaded_data[y];
+      loaded_name[ii + 1] = '\0';
+    }
+    y++;
+
+      // secs
+    for (int ii = 0; loaded_data[ii] != ','; ii++, y++) {
+      loaded_secs[ii] = loaded_data[y];
+      loaded_secs[ii + 1] = '\0';
+    }
+    y++;
+
+      // assignment
+    strcpy(task_names[i], loaded_name);
+    task_names[i][strlen(task_names[i])] = '\0';
+    tasks[i] = atoi(loaded_secs);
+  }
+
+  fclose(p_file);
+}
 
 int show_menu() {
   int choice;
