@@ -1,6 +1,7 @@
 // TODO
 // add error check for a wrong input with non-numbers in set_task()
 // make save and load data from the data file.
+// check if the program create non-existing data file
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -11,7 +12,7 @@
 #include <string.h>
 
 #define TASKS_SIZE 5
-#define MAX_LEN_NAME 30
+#define LEN_MAX_LEN 15
 
 // PROTOTYPES
 void save_data();
@@ -26,7 +27,7 @@ const int SEC_DAY = 86400;
 const int SEC_HR = 3600;
 const int SEC_MIN = 60;
 
-char task_names[TASKS_SIZE][MAX_LEN_NAME];
+char task_names[TASKS_SIZE][LEN_MAX_LEN];
 int tasks[TASKS_SIZE];
 
 
@@ -66,7 +67,7 @@ int main(int argc, char* argv[]) {
 
 void save_data() {
   FILE *p_file = fopen("data.txt", "w");
-  int size = (TASKS_SIZE * MAX_LEN_NAME) + (30 * TASKS_SIZE); // dynamically define size for the array
+  int size = (TASKS_SIZE * LEN_MAX_LEN) + (30 * TASKS_SIZE); // dynamically define size for the array
   char data_to_save[size];
 
   data_to_save[0] = '\0';
@@ -88,7 +89,7 @@ void save_data() {
 
 void load_data() {
   FILE *p_file;
-  int size = (TASKS_SIZE * MAX_LEN_NAME) + (30 * TASKS_SIZE); // dynamically define size for the array
+  int size = (TASKS_SIZE * LEN_MAX_LEN) + (30 * TASKS_SIZE); // dynamically define size for the array
   char loaded_data[size];
 
   if ((p_file = fopen("data.txt", "r")) == NULL) {
@@ -109,19 +110,19 @@ void load_data() {
 
   for (int i = 0; i < TASKS_SIZE; i++) {
     // parsing
-    char loaded_name[MAX_LEN_NAME];    
+    char loaded_name[LEN_MAX_LEN];    
     char loaded_secs[30];
 
 
       // name
-    for (int ii = 0; loaded_data[ii] != ','; ii++, y++) {
+    for (int ii = 0; loaded_data[y] != ','; ii++, y++) {
       loaded_name[ii] = loaded_data[y];
       loaded_name[ii + 1] = '\0';
     }
     y++;
 
       // secs
-    for (int ii = 0; loaded_data[ii] != ','; ii++, y++) {
+    for (int ii = 0; loaded_data[y] != '.'; ii++, y++) {
       loaded_secs[ii] = loaded_data[y];
       loaded_secs[ii + 1] = '\0';
     }
@@ -184,7 +185,17 @@ void show_tasks() {
 
   printf("= TASKS =\n----------");
   for (int i = 0; i < TASKS_SIZE; i++) {
-    printf("\n%d.%s:  ", (i + 1), task_names[i]);
+    printf("\n%d.%s", (i + 1), task_names[i]);
+
+    // Add a colon with enough spaces to line up with the other colons
+    char colon_lined[LEN_MAX_LEN + 4];
+    for (int ii = 0; ii < (LEN_MAX_LEN - (strlen(task_names[i]) - 1)); ii++) {
+      colon_lined[ii] = ' ';
+    }
+    colon_lined[strlen(colon_lined)] = '\0';
+    printf("%s", colon_lined);
+    printf("%s", "|  ");
+
     conv_secs(difftime(tasks[i], now));
   }
 }
@@ -210,8 +221,8 @@ void set_task() {
   // Task name
   printf("\nName the task: ");
   getchar();
-  fgets(task_names[index], MAX_LEN_NAME, stdin);
-  for (int i = 0; i < MAX_LEN_NAME; i++) { // remove \n from the string which fgets has added
+  fgets(task_names[index], LEN_MAX_LEN, stdin);
+  for (int i = 0; i < LEN_MAX_LEN; i++) { // remove \n from the string which fgets has added
     if (task_names[index][i] == '\n') { task_names[index][i] = '\0'; break; }
   }
 
@@ -295,6 +306,7 @@ void conv_secs(int secs) {
   if (mins < 10) z[2] = '0';
   if (secs < 10) z[3] = '0';
 
-  printf("%c%dd | [%c%d:%c%d:%c%d]", z[0], days, z[1], hrs, z[2], mins, z[3], secs);
+  printf("%c%dd [%c%d:%c%d]", z[0], days, z[1], hrs, z[2], mins); // without secs
+  // printf("\n  %c%dd [%c%d:%c%d:%c%d]", z[0], days, z[1], hrs, z[2], mins, z[3], secs); // with secs
 
 }
