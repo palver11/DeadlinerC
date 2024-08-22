@@ -1,7 +1,10 @@
 // TODO
 // add error check for a wrong input with non-numbers in set_task()
-// make save and load data from the data file.
 // check if the program create non-existing data file
+// bug in set_task(): function breaks, if entered name is too long
+//     despite truncation being successful - scanf-s glitching.
+// Option to clear a task.
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -12,7 +15,7 @@
 #include <string.h>
 
 #define TASKS_SIZE 5
-#define LEN_MAX_LEN 15
+#define NAME_MAX_LEN 16 // shoudn't be less than 5. See string literal line 37
 
 // PROTOTYPES
 void save_data();
@@ -27,7 +30,7 @@ const int SEC_DAY = 86400;
 const int SEC_HR = 3600;
 const int SEC_MIN = 60;
 
-char task_names[TASKS_SIZE][LEN_MAX_LEN];
+char task_names[TASKS_SIZE][NAME_MAX_LEN];
 int tasks[TASKS_SIZE];
 
 
@@ -67,7 +70,7 @@ int main(int argc, char* argv[]) {
 
 void save_data() {
   FILE *p_file = fopen("data.txt", "w");
-  int size = (TASKS_SIZE * LEN_MAX_LEN) + (30 * TASKS_SIZE); // dynamically define size for the array
+  int size = (TASKS_SIZE * NAME_MAX_LEN) + (30 * TASKS_SIZE); // dynamically define size for the array
   char data_to_save[size];
 
   data_to_save[0] = '\0';
@@ -89,7 +92,7 @@ void save_data() {
 
 void load_data() {
   FILE *p_file;
-  int size = (TASKS_SIZE * LEN_MAX_LEN) + (30 * TASKS_SIZE); // dynamically define size for the array
+  int size = (TASKS_SIZE * NAME_MAX_LEN) + (30 * TASKS_SIZE); // dynamically define size for the array
   char loaded_data[size];
 
   if ((p_file = fopen("data.txt", "r")) == NULL) {
@@ -110,7 +113,7 @@ void load_data() {
 
   for (int i = 0; i < TASKS_SIZE; i++) {
     // parsing
-    char loaded_name[LEN_MAX_LEN];    
+    char loaded_name[NAME_MAX_LEN];    
     char loaded_secs[30];
 
 
@@ -186,13 +189,14 @@ void show_tasks() {
   printf("= TASKS =\n----------");
   for (int i = 0; i < TASKS_SIZE; i++) {
     printf("\n%d.%s", (i + 1), task_names[i]);
-
+    // -----0 -----|  "
     // Add a colon with enough spaces to line up with the other colons
-    char colon_lined[LEN_MAX_LEN + 4];
-    for (int ii = 0; ii < (LEN_MAX_LEN - (strlen(task_names[i]) - 1)); ii++) {
+    char colon_lined[NAME_MAX_LEN];
+    int spaces_to_make = NAME_MAX_LEN - (strlen(task_names[i]) - 1);
+    for (int ii = 0; ii < spaces_to_make; ii++) {
       colon_lined[ii] = ' ';
     }
-    colon_lined[strlen(colon_lined)] = '\0';
+    colon_lined[spaces_to_make] = '\0';
     printf("%s", colon_lined);
     printf("%s", "|  ");
 
@@ -202,7 +206,7 @@ void show_tasks() {
 
 void set_task() {
   int index;
-  int year;
+  int year = 328;
   int mon;
   int day;
   int hour;
@@ -219,15 +223,20 @@ void set_task() {
   index--;
 
   // Task name
-  printf("\nName the task: ");
+  printf("\nName the task (char limit %d): ", NAME_MAX_LEN - 1);
   getchar();
-  fgets(task_names[index], LEN_MAX_LEN, stdin);
-  for (int i = 0; i < LEN_MAX_LEN; i++) { // remove \n from the string which fgets has added
-    if (task_names[index][i] == '\n') { task_names[index][i] = '\0'; break; }
+  fgets(task_names[index], NAME_MAX_LEN, stdin);
+    // remove \n from the string which fgets adds
+  for (int i = 0; i < NAME_MAX_LEN; i++) { 
+    if (task_names[index][i] == '\n') {
+      task_names[index][i] = '\0';
+      break;
+    }
   }
+  printf("\ndebug: %s", task_names[index]);
 
   // Year
-  printf("Enter end time of your deadline (nums).\nYear: ");
+  printf("\nEnter end time of your deadline (nums).\nYear: ");
   scanf("%d", &year);
 
   // Month
@@ -301,7 +310,7 @@ void conv_secs(int secs) {
 
   // format time string, add 0 to 1 digit nums
   char z[5] = {""};
-  if (days < 10) z[0] = '0';
+  if (days < 10) z[0] = ' ';
   if (hrs  < 10) z[1] = '0';
   if (mins < 10) z[2] = '0';
   if (secs < 10) z[3] = '0';
